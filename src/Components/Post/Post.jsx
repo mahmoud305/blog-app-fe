@@ -44,12 +44,14 @@ const PostWrapper = styled.div`
 
 `
 const Title = styled.h4`
- 
+ margin-top: 10px;
 text-align: center;
  
 `
 const Desc = styled.p`
  word-wrap: break-word;
+ margin: 10px 0px;
+ padding: 10px 0px;
 
 `
 const PostIcons = styled.div`

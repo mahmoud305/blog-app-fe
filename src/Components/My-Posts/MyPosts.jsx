@@ -1,8 +1,10 @@
 import { CircularProgress } from '@material-ui/core'
+ 
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom/cjs/react-router-dom.min'
 import styled from 'styled-components'
 import { privateRequst, publicRequst } from '../../Axios'
+import Pagination from '../Pagination/Pagination'
 import Post from '../Post/Post'
 const Container = styled.div`
     min-height: 100vh;
@@ -33,20 +35,23 @@ align-items: center;
 function MyPosts() {
     const [myPosts, setPosts] = useState([]);
     const { id } = useParams();
-
-
+    const [totalPosts, setTotalPosts] = useState(0);
+    const [pageNumber, setPageNumber] = useState(1);
+    const [pageSize, setPageSize] = useState(4);
+    const [isFetching, setIsFetching] = useState(false);
     async function getMyPosts() {
         try {
             // console.log(id);
-            const { data } = await privateRequst.get(`getProfilePosts/${id}`);
-            const posts = data.data;
-            setPosts(posts);
+            const { data } = await privateRequst.get(`getProfilePosts/${id}?pageNum=${pageNumber}&pageSize=${pageSize}`);
+            return data;
+            
+           
             // console.log(posts);
         } catch (error) {
             console.log("error in profile Posts\n", error);
         }
     }
-    
+
     //  useEffect(async () => {
     //     let res = await getMyPosts();
     //     console.log(res);
@@ -54,15 +59,16 @@ function MyPosts() {
     // }, [myPosts])// read on useMemo to handle the repitation of calling this useEffect
 
     useEffect(async () => {
-       let res=  await getMyPosts();
-    //    console.log("pop ",res);
-    },[JSON.stringify(myPosts)] )
-    function updatePost() {
+        setIsFetching(true);
+        
+        let res = await getMyPosts();
+        const posts = res.data.posts;
+        setTotalPosts(res.data.totalCount);
+        setPosts(posts);
+        setIsFetching(false)
+        //    console.log("pop ",res);
 
-    }
-
-
- 
+    }, [pageNumber, JSON.stringify(myPosts)])
 
     async function deletePost(postId) {
         try {
@@ -76,14 +82,14 @@ function MyPosts() {
         }
     }
 
-  
+
     return (
         <Container>
             <Wrapper>
-                {myPosts.length == 0 ? <CPContainer> <CircularProgress /> </CPContainer>
+                {isFetching ? <CPContainer> <CircularProgress /> </CPContainer>
                     : myPosts.map((post) => <Post key={post._id} postInfo={post} profilePosts={true} deletePost={deletePost} />)}
             </Wrapper>
-
+            {myPosts.length && <Pagination totalPosts={totalPosts} pageSize={pageSize} setPageNumber={setPageNumber} ></Pagination>}
         </Container>
 
         // <div>MyPosts</div>

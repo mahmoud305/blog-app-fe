@@ -11,7 +11,7 @@ import {
   Route,
   Redirect
 } from "react-router-dom";
-import { routingGuard } from "./auth";
+import RoutingGuard  from "./RoutingGuard";
 import MyAccount from "./Components/MyAccount/MyAccount";
 import MyPosts from "./Components/My-Posts/MyPosts";
 import AddPost from "./Components/AddPost/AddPost";
@@ -32,35 +32,34 @@ function App() {
 
   // console.log(user);
   return (
-    <Router>
-      {user && <Navbar logOut={logOut}/>}
+    <Router  >
+      { user &&< Navbar logOut={logOut}/>}
       <Switch>
       
-        <Route exact path="/login">
-          {routingGuard(user, Login)}
+        <Route   exact path="/login">
+        <Login/>
         </Route>
-        <Route exact path="/register">
-          {routingGuard(user, Register)}
-          {/* <Register /> */}
+        <Route   exact path="/register" >
+        <Register/>
         </Route>
-        <Route exact path={"/home"||"/"} >
-          {routingGuard(user, Home)}
-        </Route>
-        <Route exact path="/" >
-          {routingGuard(user, Home)}
-        </Route>
-        <Route exact path="/myPosts/:id" >
-          {routingGuard(user, MyPosts)}
-        </Route>
-        <Route exact path="/myAccount/:id">
-          {routingGuard(user, MyAccount)}
-        </Route>
-        <Route exact path="/updatePost/:id">
-          {routingGuard(user, PostPage)}
-        </Route>
-        <Route exact path="/addPost">
-          {routingGuard(user, PostPage)}
-        </Route>
+ 
+        <RoutingGuard   path="/home" Component={Home} >
+         
+        </RoutingGuard>
+     
+        <RoutingGuard   path="/myPosts/:id" Component={MyPosts} >
+      
+        </RoutingGuard>
+        <RoutingGuard   path="/myAccount/:id" Component={MyAccount}>
+       
+        </RoutingGuard>
+        <RoutingGuard   path="/updatePost/:id" Component={PostPage}>
+     
+        </RoutingGuard>
+        <RoutingGuard   path="/addPost" Component={PostPage}>
+  
+        </RoutingGuard>
+        <Route path="/" render={()=> <Redirect to="/home"/>} /> 
         }
       </Switch>
       {/* <Navbar /> */}

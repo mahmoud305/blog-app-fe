@@ -5,7 +5,9 @@ import Post from '../Post/Post'
 import { CircularProgress, Snackbar } from '@material-ui/core';
 import { privateRequst, publicRequst } from '../../Axios';
 import { Alert } from '@material-ui/lab';
-import {RemoveScrollBar} from 'react-remove-scroll-bar';
+import Pagination from '../Pagination/Pagination';
+ 
+
 const Container = styled.div`
     min-height: 100vh;
     background: #89ABE3FF;
@@ -18,7 +20,7 @@ const Wrapper = styled.div`
         margin: 0 auto;
         max-width: 1200px;
         background: #FCF6F5FF;
-        min-height: inherit;
+        /* min-height: inherit; */
         margin: 30px auto;
         padding: 10px 0px;
          
@@ -34,7 +36,7 @@ align-items: center;
 `
 
 const Layer = styled.div`
-position: absolute;
+position: fixed;
 top: 0%;
 right: 0%;
 left: 0%;
@@ -123,6 +125,9 @@ align-items: flex-end;
 const Label= styled.label`
 font-size: 1.25rem ;`
 
+
+ 
+
 function Home() {
     // const baseUrl="https://blog-user-posts-app3.herokuapp.com/";
     // const token = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyMjYyODdkMGU2YjkxN2ZjYTBkM2VjNiIsImVtYWlsIjoiOTI5NDY3MTI4Y0BkcmFnb25tYWlsLmxpdmUiLCJpYXQiOjE2NDc4NjU5NjcsImV4cCI6MTY0ODAzODc2N30.DDq3hOnI1Nu84OnDadeqhSaoEafgHMzxJZz1gpPbswM`
@@ -133,12 +138,24 @@ function Home() {
     const [report, setReport] = useState({postID:"",comment:""});
     const [reportLayer, setReportLayer] = useState(false);
     const [isPostReported, setIsPostReported] = useState(false);
+    const [isFetching, setIsFetching] = useState(false);
+    const [totalPosts, setTotalPosts] = useState(0);
+    const [pageNumber, setPageNumber] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
 
-    async function getPosts() {
+
+ 
+    
+
+
+
+    async function getPosts( ) {
         // const {data}= await axios.get('https://blog-user-posts-app3.herokuapp.com/getAllUsersPosts'
         // ,{ headers:{'Authorization':`Bearer ${token}`} }) ;
         try {
-            const { data } = await privateRequst.get('getAllUsersPosts');
+
+            const { data } = await privateRequst.get(`getAllUsersPosts?pageNum=${pageNumber}&pageSize=${pageSize}`);
+            // https://blog-user-posts-app3.herokuapp.com/getAllUsersPosts?pageNum=2
             return data;
         } catch (error) {
             console.log(error);
@@ -147,15 +164,19 @@ function Home() {
     useEffect(async () => {
         // /
         try {
-
+            setIsFetching(true);
             const res = await getPosts();
-            setPosts(res.data);
+             
+            setPosts(res.data.posts);
+             
+            setTotalPosts(res.data.totalCount);
+           setIsFetching(false);
             // console.log(res.data[0]);
             // console.log(res.data[0].CreatedBy);
         } catch (error) {
             console.log(error);
         }
-    }, [reportLayer]);
+    }, [pageNumber]);
 
      
     
@@ -178,6 +199,7 @@ function Home() {
     };
 
     function showReportLayer(id){
+        document.body.style.overflow = "hidden"
         const tempReport= {...report};
         tempReport.postID=id;
         setReport(tempReport);
@@ -186,6 +208,7 @@ function Home() {
         console.log(report);
     };
     function closeReportLayer(){
+        document.body.style.overflow = "auto"
         setReportLayer(false);
     };
 
@@ -199,7 +222,7 @@ function handleReportComment(e){
         <Container>
 
             <Wrapper>
-                {posts.length == 0 ? <CPContainer> <CircularProgress /> </CPContainer>
+                {isFetching  ? <CPContainer> <CircularProgress /> </CPContainer>
                     : posts.map((post) => <Post key={post._id} postInfo={post} home={true} reportPost={reportPost} showReportLayer={showReportLayer} />)}
 
                 <Snackbar open={isPostReported} autoHideDuration={4000} onClose={handleClose}>
@@ -208,11 +231,10 @@ function handleReportComment(e){
                     </Alert>
                 </Snackbar>
             </Wrapper>
-          
+          { posts.length &&  <Pagination  totalPosts={totalPosts} pageSize={pageSize} setPageNumber={setPageNumber} ></Pagination> } 
             <Layer 
             style={{ display:reportLayer?"flex":"none" , overflow:reportLayer?"hidden":"visible" }}
              >
-  {/* <RemoveScrollBar /> */}
                     <FormWrapper>
                   
                         <LoginForm>

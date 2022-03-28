@@ -110,6 +110,7 @@ justify-content: space-between;
 align-items: flex-end;
 `
 function Login() {
+  console.log("in login");
   let history= useHistory();
   const [user, setUser] = useState({"email":"" , "password":""});
   const dispatch= useDispatch();
@@ -132,15 +133,16 @@ function Login() {
       // await axios.post('https://blog-user-posts-app3.herokuapp.com/signin',user)
       const response= await publicRequst.post("/signin",user);
       const currentUser=response.data.data;
+       localStorage.setItem('currentUser',JSON.stringify(response.data.data))
       dispatch(loginSuccess(currentUser));
-      
+      history.push("/home");
       console.log(currentUser);
       // dispatch(loginSuccess(user))
     } catch (err) {
       dispatch(loginFailure());
       console.log(err);
     }
-    // console.log(response);
+    
 
     console.log(user);    
    
