@@ -121,7 +121,7 @@ function Login() {
     const tempUser={...user};
     tempUser[e.target.name]=e.target.value;
     setUser(tempUser);
-    console.log(user);
+    // console.log(user);
   }
 
   async function LoginFunction (e){
@@ -133,11 +133,12 @@ function Login() {
       // await axios.post('https://blog-user-posts-app3.herokuapp.com/signin',user)
       const response= await publicRequst.post("/signin",user);
       const currentUser=response.data.data;
-       localStorage.setItem('currentUser',JSON.stringify(response.data.data))
+      //  localStorage.setItem('currentUser',JSON.stringify(response.data.data))
       dispatch(loginSuccess(currentUser));
-      history.push("/home");
+      console.log("hello");
       console.log(currentUser);
       // dispatch(loginSuccess(user))
+      history.push("/home");
     } catch (err) {
       dispatch(loginFailure());
       console.log(err);

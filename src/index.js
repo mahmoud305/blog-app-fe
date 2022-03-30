@@ -4,7 +4,9 @@ import { Provider } from 'react-redux';
 //  import store from "./Redux/store"  
 import { CircularProgress } from '@material-ui/core';
 import './index.css';
-import { persistor, store } from "./Redux/store"
+
+// import { persistor, store } from "./Redux/store"
+ import { persistor, store } from "./Redux/store"
 import App from './App';
 import { PersistGate } from 'redux-persist/integration/react';
 // import { persistGate } from 'redux-persist/integration/react'

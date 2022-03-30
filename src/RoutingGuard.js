@@ -7,16 +7,18 @@ import Login from "./Components/Login/Login";
 import Register from "./Components/Register/RegisterPage";
 
 function RoutingGuard({ path, Component }) {
-  
+   
+
   const user = useSelector((state) => state.currentUser);
-  if (user) {
+  if (user) {     
+
     let isValidToken = checkToken();
     // let isValidToken = true;
     if (!isValidToken) {
+      console.log("invalid Token");
       return <Redirect to={"/login"} />
     } else {
-      if (path === "/login" || path === "/register")
-        return <Redirect to={"/home"} />
+      
       return <Route path={path}>  <Component /> </Route>
     }
   } else {

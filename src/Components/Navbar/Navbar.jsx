@@ -72,7 +72,7 @@ function Navbar(props) {
                     <NavLink to="/addPost"  >Add Post</NavLink>
                 </MyLink>
                 <MyLink>
-                    <NavLink to="/myAccount/3333">  My Account</NavLink>
+                    <NavLink to={`/myAccount/${id}`}>  My Account</NavLink>
                 </MyLink>
                 <MyLink>
                     <NavLink to={'/login'} onClick={props.logOut} style={{color:"red",}}>  LogOut</NavLink>

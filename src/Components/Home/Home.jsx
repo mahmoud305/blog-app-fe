@@ -6,7 +6,7 @@ import { CircularProgress, Snackbar } from '@material-ui/core';
 import { privateRequst, publicRequst } from '../../Axios';
 import { Alert } from '@material-ui/lab';
 import Pagination from '../Pagination/Pagination';
- 
+
 
 const Container = styled.div`
     min-height: 100vh;
@@ -15,7 +15,7 @@ const Container = styled.div`
 `
 const Wrapper = styled.div`
         display: flex;
-        flex-direction: column-reverse;
+        flex-direction: column;
         width: 90%;
         margin: 0 auto;
         max-width: 1200px;
@@ -96,12 +96,12 @@ background-color:#D4B996FF ;
 font-weight: bold;
 font-size: 1.25rem;
 transition: all ease 0.5s ;
-background: ${props => props.type == "submit" ?   "#2BAE66FF" : "#E94B3CFF"};
+background: ${props => props.type == "submit" ? "#2BAE66FF" : "#E94B3CFF"};
 color: #2D2926FF;
 
 &:hover{
   cursor: pointer;
-  background: ${props => props.type == "submit" ?   "#2CBD77FF" : "#FA5C4DFF"};
+  background: ${props => props.type == "submit" ? "#2CBD77FF" : "#FA5C4DFF"};
   color :#FFF;
 }
 
@@ -122,11 +122,11 @@ display: flex;
 justify-content: space-between;
 align-items: flex-end;
 `
-const Label= styled.label`
+const Label = styled.label`
 font-size: 1.25rem ;`
 
 
- 
+
 
 function Home() {
     // const baseUrl="https://blog-user-posts-app3.herokuapp.com/";
@@ -135,7 +135,7 @@ function Home() {
     //     headers:{'Authorization':`Bearer ${token}`}
     // }
     const [posts, setPosts] = useState([]);
-    const [report, setReport] = useState({postID:"",comment:""});
+    const [report, setReport] = useState({ postID: "", comment: "" });
     const [reportLayer, setReportLayer] = useState(false);
     const [isPostReported, setIsPostReported] = useState(false);
     const [isFetching, setIsFetching] = useState(false);
@@ -144,12 +144,12 @@ function Home() {
     const [pageSize, setPageSize] = useState(10);
 
 
- 
-    
 
 
 
-    async function getPosts( ) {
+
+
+    async function getPosts() {
         // const {data}= await axios.get('https://blog-user-posts-app3.herokuapp.com/getAllUsersPosts'
         // ,{ headers:{'Authorization':`Bearer ${token}`} }) ;
         try {
@@ -161,16 +161,29 @@ function Home() {
             console.log(error);
         }
     }
+    function compare(a, b) {
+        if (a.createdAt < b.createdAt)
+            return 1;
+        else if (a.createdAt > b.createdAt)
+            return -1;
+        else return 0;
+    }
+
     useEffect(async () => {
         // /
         try {
             setIsFetching(true);
             const res = await getPosts();
-             
-            setPosts(res.data.posts);
-             
+            let tempPosts = res.data.posts;
+            console.log( "before sorting", tempPosts);
+            console.log(tempPosts[0].createdAt < tempPosts[1].createdAt);
+            // tempPosts.sort((a,b)=> a.createdAt > b.createdAt ? 1 : a.createdAt < b.createdAt ? -1 : 0  );
+            // tempPosts.sort(compare)
+            console.log(  "after sorting ", tempPosts);
+            setPosts(tempPosts);
+
             setTotalPosts(res.data.totalCount);
-           setIsFetching(false);
+            setIsFetching(false);
             // console.log(res.data[0]);
             // console.log(res.data[0].CreatedBy);
         } catch (error) {
@@ -178,14 +191,14 @@ function Home() {
         }
     }, [pageNumber]);
 
-     
-    
-  async function reportPost() {
+
+
+    async function reportPost() {
         try {
             let response = await privateRequst.put("/reportPost", report);
-            setReportLayer(false);
+            closeReportLayer();
             setIsPostReported(true);
-
+            
         } catch (error) {
             console.log(error);
         }
@@ -198,31 +211,32 @@ function Home() {
         setIsPostReported(false);
     };
 
-    function showReportLayer(id){
+    function showReportLayer(id) {
         document.body.style.overflow = "hidden"
-        const tempReport= {...report};
-        tempReport.postID=id;
+        const tempReport = { ...report };
+        tempReport.postID = id;
         setReport(tempReport);
         console.log("show");
         setReportLayer(true);
         console.log(report);
     };
-    function closeReportLayer(){
+    function closeReportLayer() {
+        setReport({ postID: "", comment: "" });
         document.body.style.overflow = "auto"
         setReportLayer(false);
     };
 
-function handleReportComment(e){
-    const tempReport= {...report};
-    tempReport.comment=e.target.value;
-    setReport(tempReport);
-}
+    function handleReportComment(e) {
+        const tempReport = { ...report };
+        tempReport.comment = e.target.value;
+        setReport(tempReport);
+    }
 
     return (
         <Container>
 
             <Wrapper>
-                {isFetching  ? <CPContainer> <CircularProgress /> </CPContainer>
+                {isFetching ? <CPContainer> <CircularProgress /> </CPContainer>
                     : posts.map((post) => <Post key={post._id} postInfo={post} home={true} reportPost={reportPost} showReportLayer={showReportLayer} />)}
 
                 <Snackbar open={isPostReported} autoHideDuration={4000} onClose={handleClose}>
@@ -231,24 +245,24 @@ function handleReportComment(e){
                     </Alert>
                 </Snackbar>
             </Wrapper>
-          { posts.length &&  <Pagination  totalPosts={totalPosts} pageSize={pageSize} setPageNumber={setPageNumber} ></Pagination> } 
-            <Layer 
-            style={{ display:reportLayer?"flex":"none" , overflow:reportLayer?"hidden":"visible" }}
-             >
-                    <FormWrapper>
-                  
-                        <LoginForm>
-                            <Label htmlFor="comment" >  </Label>
-                            <Input autoFocus onChange={handleReportComment} type="text" name="comment" placeholder='Why to report this post ?'></Input>
-                        </LoginForm>
-                        <DecisionWraaper>
-                            <Button type='submit' onClick={reportPost} >   Report  </Button>
-                            <Button onClick={closeReportLayer}> Cancel  </Button>
-                            
-                        </DecisionWraaper>
-                    </FormWrapper>
+            {posts.length && <Pagination totalPosts={totalPosts} pageSize={pageSize} setPageNumber={setPageNumber} ></Pagination>}
+            <Layer
+                style={{ display: reportLayer ? "flex" : "none", overflow: reportLayer ? "hidden" : "visible" }}
+            >
+                <FormWrapper>
+
+                    <LoginForm>
+                        <Label htmlFor="comment" >  </Label>
+                        <Input autoFocus onChange={handleReportComment} value={report.comment} type="text" name="comment" placeholder='Why to report this post ?'></Input>
+                    </LoginForm>
+                    <DecisionWraaper>
+                        <Button type='submit' onClick={reportPost} >   Report  </Button>
+                        <Button onClick={closeReportLayer}> Cancel  </Button>
+
+                    </DecisionWraaper>
+                </FormWrapper>
             </Layer>
-         
+
         </Container>
 
     )

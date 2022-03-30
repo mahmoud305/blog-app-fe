@@ -37,10 +37,10 @@ function App() {
       <Switch>
       
         <Route   exact path="/login">
-        <Login/>
+        {user? <Redirect to={"/home"}/>:  <Login/> }
         </Route>
         <Route   exact path="/register" >
-        <Register/>
+        {user? <Redirect to={"/home"}/>:  <Register/> }
         </Route>
  
         <RoutingGuard   path="/home" Component={Home} >

@@ -157,7 +157,7 @@ const Register = () => {
               By creating an account, I consent to the processing of my personal
               data in accordance with the <b>PRIVACY POLICY</b>
             </Agreement>
-            <Button onClick={handleRegister} >{isLoading ? <CircularProgress color='#FFF' /> : "CREATE"}</Button>
+            <Button onClick={handleRegister} >{isLoading ? <CircularProgress   /> : "CREATE"}</Button>
           </Form>
 
           {success && <RESULT id='success' type="success" color="green" > Registered <Bold>Successfully</Bold>. Verify your Email to Login now. </RESULT>}
